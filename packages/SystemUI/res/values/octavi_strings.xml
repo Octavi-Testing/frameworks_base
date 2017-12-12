@@ -28,4 +28,6 @@
     <string name="lockscreen_default">Default</string>
     <string name="lockscreen_hidden">None</string>
 
+    <!-- VPN -->
+    <string name="status_bar_vpn">VPN</string>
 </resources>
