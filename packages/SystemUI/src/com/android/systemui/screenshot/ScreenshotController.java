@@ -391,10 +391,6 @@ public class ScreenshotController {
         mCameraSound = new MediaActionSound();
         mCameraSound.load(MediaActionSound.SHUTTER_CLICK);
 
-        // Grab system services needed for screenshot sound
-        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-
         // Grab PackageManager
         mPm = mContext.getPackageManager();
 
