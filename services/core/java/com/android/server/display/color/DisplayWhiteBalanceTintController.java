@@ -91,7 +91,36 @@ final class DisplayWhiteBalanceTintController extends ChromaticAdaptationTintCon
             mCurrentColorTemperature = cct;
 
             // Adapt the display's nominal white point to match the requested CCT value
-            setMatrixLocked(ColorSpace.cctToXyz(cct));
+            mCurrentColorTemperatureXYZ = ColorSpace.cctToXyz(cct);
+
+            mChromaticAdaptationMatrix =
+                    ColorSpace.chromaticAdaptation(ColorSpace.Adaptation.CAT16,
+                            mDisplayNominalWhiteXYZ, mCurrentColorTemperatureXYZ);
+
+            // Convert the adaptation matrix to RGB space
+            float[] result = mul3x3(mChromaticAdaptationMatrix,
+                    mDisplayColorSpaceRGB.getTransform());
+            result = mul3x3(mDisplayColorSpaceRGB.getInverseTransform(), result);
+
+            // Normalize the transform matrix to peak white value in RGB space
+            final float adaptedMaxR = result[0] + result[3] + result[6];
+            final float adaptedMaxG = result[1] + result[4] + result[7];
+            final float adaptedMaxB = result[2] + result[5] + result[8];
+            final float denum = Math.max(Math.max(adaptedMaxR, adaptedMaxG), adaptedMaxB);
+
+            Matrix.setIdentityM(mMatrixDisplayWhiteBalance, 0);
+            for (int i = 0; i < result.length; i++) {
+                result[i] /= denum;
+                if (!isColorMatrixCoeffValid(result[i])) {
+                    Slog.e(ColorDisplayService.TAG, "Invalid DWB color matrix");
+                    return;
+                }
+            }
+
+            java.lang.System.arraycopy(result, 0, mMatrixDisplayWhiteBalance, 0, 3);
+            java.lang.System.arraycopy(result, 3, mMatrixDisplayWhiteBalance, 4, 3);
+            java.lang.System.arraycopy(result, 6, mMatrixDisplayWhiteBalance, 8, 3);
+>>>>>>> c876caf368c5... display: Use CAT16 for display white balance transform
         }
 
         Slog.d(ColorDisplayService.TAG, "setDisplayWhiteBalanceTemperatureMatrix: cct = " + cct);
