@@ -26,4 +26,6 @@
     -->
     <integer name="config_udfps_hbm_type">1</integer>
 
+    <!-- Whether to show VoLTE icon in the status bar -->
+    <bool name="config_display_volte">true</bool>
 </resources>
